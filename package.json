@@ -81,8 +81,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "npm run build && vitest run tests/integration",
     "clean": "tsc -b src --clean",
-    "build": "npx @smithery/cli build",
-    "dev": "npx @smithery/cli dev"
+    "build": "tsc -b src"
   },
   "author": "Apify",
   "license": "MIT"
