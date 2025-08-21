@@ -23,10 +23,13 @@ WORKDIR /app
 
 # Copy only the necessary files from the build stage
 COPY --from=builder /app/dist ./dist
-COPY package.json package-lock.json ./
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package-lock.json ./
+COPY smithery.yaml ./
 
-# Install production dependencies only
-RUN npm ci --omit=dev
+ENV NODE_ENV=production
+ENV APIFY_TOKEN=your-api-key-here
 
-# Set the entry point for the container
-ENTRYPOINT ["node", "dist/stdio.js"]
+RUN npm ci --ignore-scripts --omit-dev
+
+ENTRYPOINT ["node", "smithery-run.js"]
