@@ -36,9 +36,11 @@
     "model context protocol"
   ],
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "tsx": "^4.20.4",
+    "zod": "^3.25.46",
     "@apify/datastructures": "^2.0.3",
     "@apify/log": "^2.5.16",
-    "@modelcontextprotocol/sdk": "^1.13.2",
     "@types/turndown": "^5.0.5",
     "ajv": "^8.17.1",
     "algoliasearch": "^5.31.0",
@@ -48,7 +50,6 @@
     "to-json-schema": "^0.2.5",
     "turndown": "^7.2.0",
     "yargs": "^17.7.2",
-    "zod": "^3.24.1",
     "zod-to-json-schema": "^3.24.1"
   },
   "devDependencies": {
@@ -63,7 +64,6 @@
     "dotenv": "^16.4.7",
     "eslint": "^9.19.0",
     "eventsource": "^3.0.2",
-    "tsx": "^4.6.2",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.23.0",
     "vitest": "^3.0.8"
@@ -74,14 +74,15 @@
     "start:dev": "tsx src/main.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "tsc -b src",
     "build:watch": "tsc -b src -w",
     "type-check": "tsc --noEmit",
     "inspector": "npm run build && npx @modelcontextprotocol/inspector dist/stdio.js",
     "test": "npm run test:unit",
     "test:unit": "vitest run tests/unit",
     "test:integration": "npm run build && vitest run tests/integration",
-    "clean": "tsc -b src --clean"
+    "clean": "tsc -b src --clean",
+    "build": "npx @smithery/cli build",
+    "dev": "npx @smithery/cli dev"
   },
   "author": "Apify",
   "license": "MIT"
