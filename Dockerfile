@@ -34,6 +34,8 @@ EXPOSE 3000
 
 # Set the environment variable for the Apify token
 ENV APIFY_TOKEN=<your-apify-token>
+RUN pwd
+RUN ls -la
 
 # Set the entry point for the container
-ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["node", "./dist/index.js"]
