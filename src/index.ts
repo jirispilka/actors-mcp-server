@@ -54,7 +54,7 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
         // We load tools asynchronously and attach the promise to the server
         // However, this approach is NOT 100% reliable - the external library may still
         // try to use the server before tools are fully loaded
-        const toolsLoadingPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
+        loadToolsFromInput(input, apifyToken, actorList.length === 0)
             .then((tools) => {
                 server.upsertTools(tools);
                 return true;
@@ -64,10 +64,6 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
                 console.error('Failed to load tools:', error);
                 return false;
             });
-
-        // Attach the promise to the server so external code can wait for it
-        (server as typeof server & { toolsReady: Promise<boolean> }).toolsReady = toolsLoadingPromise;
-
         return server.server;
     } catch (e) {
         // eslint-disable-next-line no-console
