@@ -6,7 +6,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "module": "dist/index.js",
+  "module": "./src/index.ts",
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
