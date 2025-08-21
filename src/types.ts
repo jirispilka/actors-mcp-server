@@ -11,7 +11,7 @@ import type { ProgressTracker } from './utils/progress.js';
 
 /**
  * Configuration interface for the MCP server
- * Used by both CLI (stdio.ts) and Smithery (smithery-run.ts)
+ * Used by both CLI (stdio.ts) and Smithery (index.ts)
  */
 export interface ServerConfig {
     apifyToken?: string;
