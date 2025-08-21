@@ -6,8 +6,8 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "main": "dist/index.js",
-  "module": "./src/smithery-run.ts",
+  "main": "index.js",
+  "module": "./src/index.ts",
   "exports": {
     ".": "./dist/index.js",
     "./internals": "./dist/index-internals.js",
