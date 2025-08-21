@@ -11,7 +11,7 @@ RUN npm install
 # Copy application code
 COPY . .
 
-# Build the application
+# Build the applicatio
 RUN npm run build
 
 CMD ["node", "/app/dist/index.js"]
