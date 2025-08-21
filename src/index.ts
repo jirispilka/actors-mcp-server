@@ -45,10 +45,15 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
             tools: toolCategoryKeys as ToolCategory[],
         };
 
-        // Use the shared tools loading logic
-        // const tools = await loadToolsFromInput(input, apifyToken, actorList.length === 0);
-
-        // server.upsertTools(tools);
+        // Load tools asynchronously but don't wait
+        loadToolsFromInput(input, apifyToken, actorList.length === 0)
+            .then((tools) => {
+                server.upsertTools(tools);
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error('Failed to load tools:', error);
+            });
 
         return server.server;
     } catch (e) {
