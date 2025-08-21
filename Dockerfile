@@ -25,4 +25,4 @@ ENV APIFY_TOKEN=your-apify-token
 
 RUN npm ci --ignore-scripts --omit-dev
 
-ENTRYPOINT ["node", "/app/dist/index.js"]
+ENTRYPOINT ["node", "/app/dist/stdio.js"]

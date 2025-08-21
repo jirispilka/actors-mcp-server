@@ -12,4 +12,4 @@ startCommand:
     commandFunction:
       # A function that produces the CLI command to start the MCP on stdio.
         |-
-        (config) => ({ command: 'node', args: ['dist/index.js'], env: { APIFY_TOKEN: config.apifyToken } })
+        (config) => ({ command: 'node', args: ['dist/stdio.js'], env: { APIFY_TOKEN: config.apifyToken } })
