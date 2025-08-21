@@ -1,10 +1,16 @@
 FROM node:22.12-alpine AS builder
 
-COPY . /app
-
 WORKDIR /app
 
-RUN --mount=type=cache,target=/root/.npm npm install
+# Copy package files and install dependencies
+COPY src ./src
+COPY tsconfig.json ./
+COPY package.json package-lock.json ./
+
+RUN npm install
+
+# Build the project
+RUN npm run build
 
 FROM node:22-alpine AS release
 
@@ -15,8 +21,8 @@ COPY --from=builder /app/package.json /app/package.json
 COPY --from=builder /app/package-lock.json /app/package-lock.json
 
 ENV NODE_ENV=production
-ENV APIFY_API_KEY=your-api-key-here
+ENV APIFY_TOKEN=your-apify-token
 
 RUN npm ci --ignore-scripts --omit-dev
 
-ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["node", "/app/dist/index.js"]
