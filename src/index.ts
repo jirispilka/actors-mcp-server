@@ -1,55 +1,54 @@
 #!/usr/bin/env node
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { ActorsMcpServer } from './mcp/server.js';
+import type {Input, ToolCategory} from "./types";
+import {loadToolsFromInput} from "./utils/tools-loader";
 
 export const configSchema = z.object({
-    notionApiKey: z
+    apifyToken: z
         .string()
         .describe(
-            'Notion API key, obtained from https://www.notion.so/profile/integrations/',
+            'Apify token, learn more: https://docs.apify.com/platform/integrations/api#api-token',
         ),
+    actors: z
+        .string()
+        .optional()
+        .describe('Comma-separated list of Actor full names to add to the server'),
+    enableAddingActors: z
+        .boolean()
+        .default(true)
+        .describe('Enable dynamically adding Actors as tools based on user requests'),
+    tools: z
+        .string()
+        .optional()
+        .describe('Comma-separated list of specific tool categories to enable (docs,runs,storage,preview)'),
 });
 
 export default function ({ config: _config }: { config: z.infer<typeof configSchema> }) {
     try {
-        const server = new McpServer({
-            name: 'Notion',
-            version: '1.0.0',
-        });
+        // const server = new McpServer({
+        //     name: 'Notion',
+        //     version: '1.0.0',
+        // });
 
-        // Tool: Echo Query
-        server.tool(
-            'echo_query',
-            'A dummy tool that echoes back any query sent to it. Useful for testing.',
-            {
-                query: z
-                    .string()
-                    .describe(
-                        'Any text query that will be echoed back.',
-                    ),
-            },
-            async ({ query }) => {
-                try {
-                    return {
-                        content: [
-                            {
-                                type: 'text',
-                                text: `Echo: ${query}`,
-                            },
-                        ],
-                    };
-                } catch (e: unknown) {
-                    return {
-                        content: [
-                            {
-                                type: 'text',
-                                text: `Error: ${e instanceof Error ? e.message : 'Unknown error'}`,
-                            },
-                        ],
-                    };
-                }
-            },
-        );
+        const apifyToken = _config.apifyToken || process.env.APIFY_TOKEN || '';
+        const enableAddingActors = _config.enableAddingActors ?? true;
+        const actors = _config.actors || '';
+        const actorList = actors ? actors.split(',').map((a: string) => a.trim()) : [];
+        const toolCategoryKeys = _config.tools ? _config.tools.split(',').map((t: string) => t.trim()) : [];
+
+        const server = new ActorsMcpServer({ enableAddingActors, enableDefaultActors: false });
+
+        const input: Input = {
+            actors: actorList.length ? actorList : [],
+            enableAddingActors,
+            tools: toolCategoryKeys as ToolCategory[],
+        };
+
+        // Use the shared tools loading logic
+        // const tools = await loadToolsFromInput(input, apifyToken, actorList.length === 0);
+
+        // server.upsertTools(tools);
 
         return server.server;
     } catch (e) {
