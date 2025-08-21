@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { z } from 'zod';
+
 import { ActorsMcpServer } from './mcp/server.js';
-import type {Input, ToolCategory} from "./types";
-import {loadToolsFromInput} from "./utils/tools-loader";
+import type { Input, ToolCategory } from './types';
+import { loadToolsFromInput } from './utils/tools-loader.js';
 
 export const configSchema = z.object({
     apifyToken: z
@@ -24,18 +25,22 @@ export const configSchema = z.object({
         .describe('Comma-separated list of specific tool categories to enable (docs,runs,storage,preview)'),
 });
 
+// eslint-disable-next-line
 export default function ({ config: _config }: { config: z.infer<typeof configSchema> }) {
     try {
-        // const server = new McpServer({
-        //     name: 'Notion',
-        //     version: '1.0.0',
-        // });
-
         const apifyToken = _config.apifyToken || process.env.APIFY_TOKEN || '';
         const enableAddingActors = _config.enableAddingActors ?? true;
         const actors = _config.actors || '';
         const actorList = actors ? actors.split(',').map((a: string) => a.trim()) : [];
         const toolCategoryKeys = _config.tools ? _config.tools.split(',').map((t: string) => t.trim()) : [];
+
+        // Validate environment
+        if (!apifyToken) {
+            // eslint-disable-next-line no-console
+            console.warn('APIFY_TOKEN is required but not set in the environment variables or config. Some tools may not work properly.');
+        } else {
+            process.env.APIFY_TOKEN = apifyToken; // Ensure token is set in the environment
+        }
 
         const server = new ActorsMcpServer({ enableAddingActors, enableDefaultActors: false });
 
@@ -45,15 +50,23 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
             tools: toolCategoryKeys as ToolCategory[],
         };
 
-        // Load tools asynchronously but don't wait
-        loadToolsFromInput(input, apifyToken, actorList.length === 0)
+        // NOTE: This is a workaround for Smithery's requirement of a synchronous function
+        // We load tools asynchronously and attach the promise to the server
+        // However, this approach is NOT 100% reliable - the external library may still
+        // try to use the server before tools are fully loaded
+        const toolsLoadingPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
             .then((tools) => {
                 server.upsertTools(tools);
+                return true;
             })
             .catch((error) => {
                 // eslint-disable-next-line no-console
                 console.error('Failed to load tools:', error);
+                return false;
             });
+
+        // Attach the promise to the server so external code can wait for it
+        (server as typeof server & { toolsReady: Promise<boolean> }).toolsReady = toolsLoadingPromise;
 
         return server.server;
     } catch (e) {
