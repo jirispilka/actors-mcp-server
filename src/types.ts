@@ -9,6 +9,20 @@ import type { ActorsMcpServer } from './mcp/server.js';
 import type { toolCategories } from './tools/index.js';
 import type { ProgressTracker } from './utils/progress.js';
 
+/**
+ * Configuration interface for the MCP server
+ * Used by both CLI (stdio.ts) and Smithery (smithery-run.ts)
+ */
+export interface ServerConfig {
+    apifyToken?: string;
+    actors?: string;
+    enableAddingActors: boolean;
+    /** @deprecated */
+    enableActorAutoLoading: boolean;
+    /** Tool categories to include */
+    tools?: string;
+}
+
 export interface ISchemaProperties {
     type: string;
 
