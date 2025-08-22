@@ -24,7 +24,7 @@ import log from '@apify/log';
 
 import { ActorsMcpServer } from './mcp/server.js';
 import { toolCategories } from './tools/index.js';
-import type { Input, ServerConfig, ToolCategory } from './types.js';
+import type { Input, ServerConfigCli, ToolCategory } from './types.js';
 import { loadToolsFromInput } from './utils/tools-loader.js';
 
 // Configure logging, set to ERROR
@@ -74,7 +74,7 @@ Note: Tools that enable you to search Actors from the Apify Store and get their 
         + ' and set the environment variable `APIFY_TOKEN` to your Apify API token.\n',
     )
     .epilogue('For more information, visit https://mcp.apify.com or https://github.com/apify/actors-mcp-server')
-    .parseSync() as ServerConfig;
+    .parseSync() as ServerConfigCli;
 
 const enableAddingActors = argv.enableAddingActors && argv.enableActorAutoLoading;
 const actors = argv.actors as string || '';

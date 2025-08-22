@@ -9,11 +9,11 @@ import { z } from 'zod';
 
 import { ActorsMcpServer } from './mcp/server.js';
 import type { Input, ToolCategory } from './types';
-import { configSmithery } from './types.js'; // <-- updated import
+import { serverConfigSchemaSmithery as configSchema } from './types.js';
 import { loadToolsFromInput } from './utils/tools-loader.js';
 
 // Export the config schema for Smithery. The export must be named configSchema
-export { configSmithery as configSchema };
+export { configSchema };
 
 export { ActorsMcpServer };
 
@@ -24,7 +24,7 @@ export { ActorsMcpServer };
  * @param param0 
  * @returns 
  */
-export default function ({ config: _config }: { config: z.infer<typeof configSmithery> }) {
+export default function ({ config: _config }: { config: z.infer<typeof configSchema> }) {
     try {
         const apifyToken = _config.apifyToken || process.env.APIFY_TOKEN || '';
         const enableAddingActors = _config.enableAddingActors ?? true;

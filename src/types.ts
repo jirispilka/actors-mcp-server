@@ -14,15 +14,44 @@ import type { ProgressTracker } from './utils/progress.js';
  * Configuration interface for the MCP server
  * Used by both CLI (stdio.ts) and Smithery (index.ts)
  */
-export interface ServerConfig {
-    apifyToken?: string;
-    actors?: string;
-    enableAddingActors: boolean;
+// export interface ServerConfig {
+//     apifyToken?: string;
+//     actors?: string;
+//     enableAddingActors: boolean;
+//     /** @deprecated */
+//     enableActorAutoLoading: boolean;
+//     /** Tool categories to include */
+//     tools?: string;
+// }
+
+export const serverConfigSchemaCli = z.object({
+    actors: z
+        .string()
+        .optional()
+        .describe('Comma-separated list of Actor full names to add to the server'),
+    enableAddingActors: z
+        .boolean()
+        .default(true)
+        .describe('Enable dynamically adding Actors as tools based on user requests'),
+    tools: z
+        .string()
+        .optional()
+        .describe('Comma-separated list of specific tool categories to enable (docs,runs,storage,preview)'),
     /** @deprecated */
-    enableActorAutoLoading: boolean;
-    /** Tool categories to include */
-    tools?: string;
-}
+    enableActorAutoLoading: z
+        .boolean()
+        .default(true)
+        .describe('Deprecated: use enable-adding-actors instead.'),
+});
+
+export const serverConfigSchemaSmithery = serverConfigSchemaCli.extend({
+    apifyToken: z
+        .string()
+        .describe('Apify token, learn more: https://docs.apify.com/platform/integrations/api#api-token'),
+});
+
+export type ServerConfigCli = z.infer<typeof serverConfigSchemaCli>;
+
 
 export interface ISchemaProperties {
     type: string;
@@ -296,23 +325,3 @@ export type PromptBase = Prompt & {
 };
 
 export type ActorInputSchemaProperties = Record<string, ISchemaProperties>;
-
-export const configSmithery = z.object({
-    apifyToken: z
-        .string()
-        .describe(
-            'Apify token, learn more: https://docs.apify.com/platform/integrations/api#api-token',
-        ),
-    actors: z
-        .string()
-        .optional()
-        .describe('Comma-separated list of Actor full names to add to the server'),
-    enableAddingActors: z
-        .boolean()
-        .default(true)
-        .describe('Enable dynamically adding Actors as tools based on user requests'),
-    tools: z
-        .string()
-        .optional()
-        .describe('Comma-separated list of specific tool categories to enable (docs,runs,storage,preview)'),
-});
