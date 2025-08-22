@@ -51,6 +51,8 @@ export class ActorsMcpServer {
     private options: ActorsMcpServerOptions;
     private toolsChangedHandler: ToolsChangedHandler | undefined;
     private sigintHandler: (() => Promise<void>) | undefined;
+    // Barrier to gate the first listTools until initial load settles
+    private listToolsBarrier: Promise<void> | null = null;
 
     constructor(options: ActorsMcpServerOptions = {}, setupSigintHandler = true) {
         this.options = {
@@ -87,6 +89,16 @@ export class ActorsMcpServer {
         this.initialize().catch((error) => {
             log.error('Failed to initialize server', { error });
         });
+    }
+
+    /**
+     * Block the first listTools until the provided promise settles or timeout elapses.
+     * Subsequent listTools calls are not blocked unless called again.
+     */
+    public blockListToolsUntil(promise: Promise<unknown>, timeoutMs = 8_000) {
+        const done = Promise.resolve(promise).then(() => undefined).catch(() => undefined);
+        const timeout = new Promise<void>((resolve) => setTimeout(resolve, timeoutMs));
+        this.listToolsBarrier = Promise.race([done, timeout]).then(() => undefined);
     }
 
     /**
@@ -391,6 +403,10 @@ export class ActorsMcpServer {
          * @returns {object} - The response object containing the tools.
          */
         this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+            if (this.listToolsBarrier) {
+                await this.listToolsBarrier;
+                this.listToolsBarrier = null;
+            }
             const tools = Array.from(this.tools.values()).map((tool) => getToolPublicFieldOnly(tool.tool));
             return { tools };
         });

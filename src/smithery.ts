@@ -43,16 +43,23 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
             tools: toolCategoryKeys as ToolCategory[],
         };
 
-        // huh
-        return {
-            async connect(transport: any) {
-                if (apifyToken) {
-                    const tools = await loadToolsFromInput(input, apifyToken, actorList.length === 0);
+        // Start async tools loading and gate the first listTools
+        if (apifyToken) {
+            const loadPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
+                .then((tools) => {
                     server.upsertTools(tools);
-                }
-                return await server.server.connect(transport);
-            },
-        };
+                })
+                .catch((error) => {
+                    // eslint-disable-next-line no-console
+                    console.error('Failed to load tools:', error);
+                });
+            server.blockListToolsUntil(loadPromise);
+        } else {
+            // eslint-disable-next-line no-console
+            console.warn('APIFY_TOKEN not provided; skipping Actor tool loading. Only internal tools will be available.');
+        }
+
+        return server.server;
 
     } catch (e) {
         // eslint-disable-next-line no-console
