@@ -7,7 +7,7 @@
         "node": ">=18.0.0"
     },
     "main": "dist/index.js",
-    "module": "dist/index.js",
+    "module": "./src/index.js", 
     "exports": {
         ".": "./dist/index.js",
         "./internals": "./dist/index-internals.js",
