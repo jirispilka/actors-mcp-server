@@ -3,6 +3,7 @@ import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/proto
 import type { Notification, Prompt, Request } from '@modelcontextprotocol/sdk/types.js';
 import type { ValidateFunction } from 'ajv';
 import type { ActorDefaultRunOptions, ActorDefinition, ActorStoreList, PricingInfo } from 'apify-client';
+import { z } from 'zod';
 
 import type { ACTOR_PRICING_MODEL } from './const.js';
 import type { ActorsMcpServer } from './mcp/server.js';
@@ -295,3 +296,23 @@ export type PromptBase = Prompt & {
 };
 
 export type ActorInputSchemaProperties = Record<string, ISchemaProperties>;
+
+export const configSmithery = z.object({
+    apifyToken: z
+        .string()
+        .describe(
+            'Apify token, learn more: https://docs.apify.com/platform/integrations/api#api-token',
+        ),
+    actors: z
+        .string()
+        .optional()
+        .describe('Comma-separated list of Actor full names to add to the server'),
+    enableAddingActors: z
+        .boolean()
+        .default(true)
+        .describe('Enable dynamically adding Actors as tools based on user requests'),
+    tools: z
+        .string()
+        .optional()
+        .describe('Comma-separated list of specific tool categories to enable (docs,runs,storage,preview)'),
+});

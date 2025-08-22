@@ -9,28 +9,10 @@ import { z } from 'zod';
 
 import { ActorsMcpServer } from './mcp/server.js';
 import type { Input, ToolCategory } from './types';
+import { configSmithery } from './types.js'; // <-- updated import
 import { loadToolsFromInput } from './utils/tools-loader.js';
 
-export const configSchemaSmithery = z.object({
-    apifyToken: z
-        .string()
-        .describe(
-            'Apify token, learn more: https://docs.apify.com/platform/integrations/api#api-token',
-        ),
-    actors: z
-        .string()
-        .optional()
-        .describe('Comma-separated list of Actor full names to add to the server'),
-    enableAddingActors: z
-        .boolean()
-        .default(true)
-        .describe('Enable dynamically adding Actors as tools based on user requests'),
-    tools: z
-        .string()
-        .optional()
-        .describe('Comma-separated list of specific tool categories to enable (docs,runs,storage,preview)'),
-});
-
+export { configSmithery as configSchemaSmithery };
 
 export { ActorsMcpServer };
 
@@ -41,7 +23,7 @@ export { ActorsMcpServer };
  * @param param0 
  * @returns 
  */
-export default function ({ config: _config }: { config: z.infer<typeof configSchemaSmithery> }) {
+export default function ({ config: _config }: { config: z.infer<typeof configSmithery> }) {
     try {
         const apifyToken = _config.apifyToken || process.env.APIFY_TOKEN || '';
         const enableAddingActors = _config.enableAddingActors ?? true;
@@ -68,6 +50,24 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
         // NOTE: This is a workaround for Smithery's requirement of a synchronous function
         // We load tools asynchronously and attach the promise to the server
         // However, this approach is NOT 100% reliable - the external library may still
+        // try to use the server before tools are fully loaded
+        loadToolsFromInput(input, apifyToken, actorList.length === 0)
+            .then((tools) => {
+                server.upsertTools(tools);
+                return true;
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error('Failed to load tools:', error);
+                return false;
+            });
+        return server.server;
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+        throw e;
+    }
+}
         // try to use the server before tools are fully loaded
         loadToolsFromInput(input, apifyToken, actorList.length === 0)
             .then((tools) => {
