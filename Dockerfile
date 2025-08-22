@@ -2,7 +2,6 @@ FROM node:22.12-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files and install dependencies
 COPY package.json package-lock.json ./
 
 # Install all dependencies (including devDependencies for build)
