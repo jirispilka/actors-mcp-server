@@ -28,7 +28,6 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
         const actorList = actors ? actors.split(',').map((a: string) => a.trim()) : [];
         const toolCategoryKeys = _config.tools ? _config.tools.split(',').map((t: string) => t.trim()) : [];
 
-        // Validate environment
         if (!apifyToken) {
             // eslint-disable-next-line no-console
             console.warn('APIFY_TOKEN is required but not set in the environment variables or config. Some tools may not work properly.');
