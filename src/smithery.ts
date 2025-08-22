@@ -11,6 +11,7 @@ import { ActorsMcpServer } from './mcp/server.js';
 import type { Input, ToolCategory } from './types';
 import { serverConfigSchemaSmithery as configSchema } from './types.js';
 import { loadToolsFromInput } from './utils/tools-loader.js';
+import { PLACEHOLDER_APIFY_TOKEN } from './const.js';
 
 // Export the config schema for Smithery. The export must be named configSchema
 export { configSchema };
@@ -48,7 +49,7 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
                 // eslint-disable-next-line no-console
                 console.error('Failed to load tools with provided token. Retrying with placeholder token, error', error);
                 try {
-                    const tools = await loadToolsFromInput(input, 'your-apify-token', actorList.length === 0);
+                    const tools = await loadToolsFromInput(input, PLACEHOLDER_APIFY_TOKEN, actorList.length === 0);
                     server.upsertTools(tools);
                 } catch (retryError) {
                     // eslint-disable-next-line no-console
