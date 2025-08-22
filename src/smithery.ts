@@ -39,7 +39,7 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
         };
 
         // Start async tools loading and gate the first listTools (Smithery-only)
-        // See docs/smithery.md for a brief overview of how this entrypoint works with Smithery.
+        // See docs/smithery.md for a brief overview of how this entrypoint works with Smithery
         const loadPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
             .then((tools) => {
                 server.upsertTools(tools);
