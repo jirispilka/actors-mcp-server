@@ -1,6 +1,5 @@
 FROM node:22.12-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files and install dependencies
@@ -17,7 +16,6 @@ RUN npm run build
 
 FROM node:22-alpine AS release
 
-# Set working directory
 WORKDIR /app
 
 # Copy only the necessary files from the build stage
