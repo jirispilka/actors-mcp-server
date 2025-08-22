@@ -1,1 +1,31 @@
-runtime: typescript
+runtime: "container"
+build:
+  dockerfile: "Dockerfile"           # Path to your Dockerfile
+  dockerBuildPath: "."               # Docker build context
+startCommand:
+  type: "stdio"
+  configSchema:                      # Optional: JSON Schema for configuration
+    type: "object"
+    properties:
+      actors:
+        type: "string"
+        description: "Comma-separated list of Actor full names to add to the server"
+      enableAddingActors:
+        type: "boolean"
+        description: "Enable dynamically adding Actors as tools based on user requests"
+      tools:
+        type: "string"
+        description: "Comma-separated list of specific tool categories to enable"
+      enableActorAutoLoading:
+        type: "boolean"
+        description: "Deprecated: use enableAddingActors instead"
+      apifyToken:
+        type: "string"
+        description: "Apify token, learn more: https://docs.apify.com/platform/integrations/api#api-token"
+    required: ["apiKey"]
+  exampleConfig:                     # Optional: Example configuration
+    actors: "apify/rag-web-browser"
+    enableAddingActors: true
+    tools: "docs"
+    enableActorAutoLoading: true
+    apifyToken: "your-apify-token-here"
