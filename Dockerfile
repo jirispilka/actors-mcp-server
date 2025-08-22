@@ -11,7 +11,6 @@ RUN npm ci --ignore-scripts
 COPY src ./src
 COPY tsconfig.json ./
 
-# Build the project
 RUN npm run build
 
 FROM node:22-alpine AS release
