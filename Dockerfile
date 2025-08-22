@@ -51,4 +51,4 @@ ENV APIFY_TOKEN=your-api-key-here
 RUN npm ci --ignore-scripts --omit-dev
 
 # Set the entry point for the container
-ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["node", "/dist/index.js"]
