@@ -11,7 +11,7 @@ import { ActorsMcpServer } from './mcp/server.js';
 import type { Input, ToolCategory } from './types';
 import { loadToolsFromInput } from './utils/tools-loader.js';
 
-export const configSchema = z.object({
+export const configSchemaSmithery = z.object({
     apifyToken: z
         .string()
         .describe(
@@ -41,7 +41,7 @@ export { ActorsMcpServer };
  * @param param0 
  * @returns 
  */
-export default function ({ config: _config }: { config: z.infer<typeof configSchema> }) {
+export default function ({ config: _config }: { config: z.infer<typeof configSchemaSmithery> }) {
     try {
         const apifyToken = _config.apifyToken || process.env.APIFY_TOKEN || '';
         const enableAddingActors = _config.enableAddingActors ?? true;
