@@ -38,6 +38,7 @@ The Apify Model Context Protocol (MCP) Server at **mcp.apify.com** instantly con
 - [⚙️ Development](#-development)
 - [🤝 Contributing](#-contributing)
 - [📚 Learn more](#-learn-more)
+ 
 
 # 🌐 Introducing the Apify MCP server
 
@@ -257,6 +258,8 @@ The Actor input schema is processed to be compatible with most MCP clients while
 - **Array item types** are inferred when not explicitly defined in the schema, using a priority order: explicit type in items > prefill type > default value type > editor type.
 - **Enum values and examples** are added to property descriptions to ensure visibility, even if the client doesn't fully support the JSON schema.
 - **Rental Actors** are only available for use with the hosted MCP server at https://mcp.apify.com. When running the server locally via stdio, you can only access Actors that are already added to your local toolset. To dynamically search for and use any Actor from the Apify Store—including rental Actors—connect to the hosted endpoint.
+
+ 
 
 # 🤝 Contributing
 

@@ -22,7 +22,7 @@ export { configSchema };
  */
 export default function ({ config: _config }: { config: z.infer<typeof configSchema> }) {
     try {
-        const apifyToken = _config.apifyToken || process.env.APIFY_TOKEN || '';
+        let apifyToken = _config.apifyToken || process.env.APIFY_TOKEN || '';
         const enableAddingActors = _config.enableAddingActors ?? true;
         const actors = _config.actors || '';
         const actorList = actors ? actors.split(',').map((a: string) => a.trim()) : [];
@@ -31,10 +31,11 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
         if (!apifyToken) {
             // eslint-disable-next-line no-console
             console.warn('APIFY_TOKEN is required but not set in the environment variables or config. Some tools may not work properly.');
+            apifyToken = 'your-apify-token'
         } else {
-            process.env.APIFY_TOKEN = apifyToken; // Ensure token is set in the environment
         }
 
+        process.env.APIFY_TOKEN = apifyToken; // Ensure token is set in the environment
         const server = new ActorsMcpServer({ enableAddingActors, enableDefaultActors: false });
 
         const input: Input = {
@@ -43,22 +44,17 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
             tools: toolCategoryKeys as ToolCategory[],
         };
 
-        // Start async tools loading and gate the first listTools
-        if (apifyToken) {
-            const loadPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
-                .then((tools) => {
-                    server.upsertTools(tools);
-                })
-                .catch((error) => {
-                    // eslint-disable-next-line no-console
-                    console.error('Failed to load tools:', error);
-                });
-            server.blockListToolsUntil(loadPromise);
-        } else {
-            // eslint-disable-next-line no-console
-            console.warn('APIFY_TOKEN not provided; skipping Actor tool loading. Only internal tools will be available.');
-        }
-
+        // Start async tools loading and gate the first listTools (Smithery-only)
+        // See docs/smithery.md for a brief overview of how this entrypoint works with Smithery.
+        const loadPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
+            .then((tools) => {
+                server.upsertTools(tools);
+            })
+            .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error('Failed to load tools:', error);
+            });
+        server.blockListToolsUntil(loadPromise);
         return server.server;
 
     } catch (e) {

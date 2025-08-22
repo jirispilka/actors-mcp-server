@@ -51,7 +51,10 @@ export class ActorsMcpServer {
     private options: ActorsMcpServerOptions;
     private toolsChangedHandler: ToolsChangedHandler | undefined;
     private sigintHandler: (() => Promise<void>) | undefined;
-    // Barrier to gate the first listTools until initial load settles
+    // Barrier to gate the first listTools until initial load settles.
+    // NOTE: This mechanism is intended to be used ONLY by the Smithery entrypoint
+    // (see src/smithery.ts). Other server entrypoints (stdio/SSE/HTTP) do not
+    // use this and are unaffected.
     private listToolsBarrier: Promise<void> | null = null;
 
     constructor(options: ActorsMcpServerOptions = {}, setupSigintHandler = true) {
@@ -92,8 +95,12 @@ export class ActorsMcpServer {
     }
 
     /**
-     * Block the first listTools until the provided promise settles or timeout elapses.
-     * Subsequent listTools calls are not blocked unless called again.
+     * Block the first listTools request until the provided promise settles or a timeout elapses.
+     * Subsequent listTools calls are not blocked unless this method is invoked again.
+     *
+     * This is used exclusively by the Smithery entrypoint to satisfy its synchronous
+     * factory requirement while ensuring initial tools are available on the first
+     * listTools call. Other entrypoints should not rely on this.
      */
     public blockListToolsUntil(promise: Promise<unknown>, timeoutMs = 8_000) {
         const done = Promise.resolve(promise).then(() => undefined).catch(() => undefined);
