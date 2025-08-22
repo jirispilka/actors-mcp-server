@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+/*
+ This file provides essential functions and tools for MCP servers, serving as a library.
+ The ActorsMcpServer should be the only class exported from the package
+
+ Also, it serves as the main entry point for smithery deployment.
+*/
 import { z } from 'zod';
 
 import { ActorsMcpServer } from './mcp/server.js';
@@ -25,7 +31,16 @@ export const configSchema = z.object({
         .describe('Comma-separated list of specific tool categories to enable (docs,runs,storage,preview)'),
 });
 
+
+export { ActorsMcpServer };
+
+
 // eslint-disable-next-line
+/**
+ * Main entrypoint for Smithery deployment, do not change signature of this function. 
+ * @param param0 
+ * @returns 
+ */
 export default function ({ config: _config }: { config: z.infer<typeof configSchema> }) {
     try {
         const apifyToken = _config.apifyToken || process.env.APIFY_TOKEN || '';
