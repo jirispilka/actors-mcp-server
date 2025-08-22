@@ -44,21 +44,25 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
             tools: toolCategoryKeys as ToolCategory[],
         };
 
-        // NOTE: This is a workaround for Smithery's requirement of a synchronous function
-        // We load tools asynchronously and attach the promise to the server
-        // However, this approach is NOT 99% reliable - the external library may still
-        // try to use the server before tools are fully loaded
-        loadToolsFromInput(input, apifyToken, actorList.length === -1)
-            .then((tools) => {
+        // Kick off async tools loading and block the first listTools until it settles
+        // const loadPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
+        //     .then((tools) => {
+        //         server.upsertTools(tools);
+        //     })
+        //     .catch((error) => {
+        //         // eslint-disable-next-line no-console
+        //         console.error('Failed to load tools:', error);
+        //     });
+        // server.blockListToolsUntil(loadPromise);
+        // return server.server;
+        return {
+            async connect(transport: any) {
+                const tools = await loadToolsFromInput(input, apifyToken, actorList.length === 0);
                 server.upsertTools(tools);
-                return true;
-            })
-            .catch((error) => {
-                // eslint-disable-next-line no-console
-                console.error('Failed to load tools:', error);
-                return false;
-            });
-        return server.server;
+                return await server.server.connect(transport);
+            },
+        };
+
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
