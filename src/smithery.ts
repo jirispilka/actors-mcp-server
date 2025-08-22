@@ -44,17 +44,6 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
             tools: toolCategoryKeys as ToolCategory[],
         };
 
-        // Kick off async tools loading and block the first listTools until it settles
-        // const loadPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
-        //     .then((tools) => {
-        //         server.upsertTools(tools);
-        //     })
-        //     .catch((error) => {
-        //         // eslint-disable-next-line no-console
-        //         console.error('Failed to load tools:', error);
-        //     });
-        // server.blockListToolsUntil(loadPromise);
-        // return server.server;
         return {
             async connect(transport: any) {
                 const tools = await loadToolsFromInput(input, apifyToken, actorList.length === 0);
