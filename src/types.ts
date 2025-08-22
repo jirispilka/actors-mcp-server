@@ -52,7 +52,6 @@ export const serverConfigSchemaSmithery = serverConfigSchemaCli.extend({
 
 export type ServerConfigCli = z.infer<typeof serverConfigSchemaCli>;
 
-
 export interface ISchemaProperties {
     type: string;
 
