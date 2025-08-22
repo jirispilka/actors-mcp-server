@@ -17,7 +17,6 @@
 #CMD ["node", "/app/dist/index.js"]
 #
 
-#FROM node:18-alpine AS builder
 FROM node:22.12-alpine AS builder
 
 # Set working directory
@@ -35,7 +34,6 @@ RUN npm ci --ignore-scripts
 RUN npm run build
 
 FROM node:22-alpine AS release
-#FROM node:18-alpine AS release
 
 # Set working directory
 WORKDIR /app
