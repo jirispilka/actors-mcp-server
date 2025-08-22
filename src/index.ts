@@ -12,7 +12,8 @@ import type { Input, ToolCategory } from './types';
 import { configSmithery } from './types.js'; // <-- updated import
 import { loadToolsFromInput } from './utils/tools-loader.js';
 
-export { configSmithery as configSchemaSmithery };
+// Export the config schema for Smithery. The export must be named configSchema
+export { configSmithery as configSchema };
 
 export { ActorsMcpServer };
 
@@ -50,24 +51,6 @@ export default function ({ config: _config }: { config: z.infer<typeof configSmi
         // NOTE: This is a workaround for Smithery's requirement of a synchronous function
         // We load tools asynchronously and attach the promise to the server
         // However, this approach is NOT 100% reliable - the external library may still
-        // try to use the server before tools are fully loaded
-        loadToolsFromInput(input, apifyToken, actorList.length === 0)
-            .then((tools) => {
-                server.upsertTools(tools);
-                return true;
-            })
-            .catch((error) => {
-                // eslint-disable-next-line no-console
-                console.error('Failed to load tools:', error);
-                return false;
-            });
-        return server.server;
-    } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e);
-        throw e;
-    }
-}
         // try to use the server before tools are fully loaded
         loadToolsFromInput(input, apifyToken, actorList.length === 0)
             .then((tools) => {
