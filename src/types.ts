@@ -47,7 +47,7 @@ export const serverConfigSchemaCli = z.object({
 export const serverConfigSchemaSmithery = serverConfigSchemaCli.extend({
     apifyToken: z
         .string()
-        .describe('Apify token, learn more: https://docs.apify.com/platform/integrations/api#api-token'),
+        .describe('Apify token, learn more: https://docs.apify.com/platform/integrations/api#api-token')
 });
 
 export type ServerConfigCli = z.infer<typeof serverConfigSchemaCli>;
