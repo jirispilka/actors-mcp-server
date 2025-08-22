@@ -45,8 +45,10 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
 
         return {
             async connect(transport: any) {
-                const tools = await loadToolsFromInput(input, apifyToken, actorList.length === 0);
-                server.upsertTools(tools);
+                if (apifyToken) {
+                    const tools = await loadToolsFromInput(input, apifyToken, actorList.length === 0);
+                    server.upsertTools(tools);
+                }
                 return await server.server.connect(transport);
             },
         };
