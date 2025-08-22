@@ -40,14 +40,22 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
 
         // Start async tools loading and gate the first listTools (Smithery-only)
         // See docs/smithery.md for a brief overview of how this entrypoint works with Smithery
-        const loadPromise = loadToolsFromInput(input, apifyToken, actorList.length === 0)
-            .then((tools) => {
+        const loadPromise = (async () => {
+            try {
+                const tools = await loadToolsFromInput(input, apifyToken, actorList.length === 0);
                 server.upsertTools(tools);
-            })
-            .catch((error) => {
+            } catch (error) {
                 // eslint-disable-next-line no-console
-                console.error('Failed to load tools:', error);
-            });
+                console.error('Failed to load tools with provided token. Retrying with placeholder token, error', error);
+                try {
+                    const tools = await loadToolsFromInput(input, 'your-apify-token', actorList.length === 0);
+                    server.upsertTools(tools);
+                } catch (retryError) {
+                    // eslint-disable-next-line no-console
+                    console.error('Retry failed to load tools with placeholder token, error:', retryError);
+                }
+            }
+        })();
         server.blockListToolsUntil(loadPromise);
         return server.server;
 
