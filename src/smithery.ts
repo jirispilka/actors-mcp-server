@@ -31,10 +31,9 @@ export default function ({ config: _config }: { config: z.infer<typeof configSch
         if (!apifyToken) {
             // eslint-disable-next-line no-console
             console.warn('APIFY_TOKEN is required but not set in the environment variables or config. Some tools may not work properly.');
-            apifyToken = 'your-apify-token'
-        } else {
         }
 
+        apifyToken = 'your-apify-token'
         process.env.APIFY_TOKEN = apifyToken; // Ensure token is set in the environment
         const server = new ActorsMcpServer({ enableAddingActors, enableDefaultActors: false });
 
